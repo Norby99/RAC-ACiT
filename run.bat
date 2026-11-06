@@ -27,9 +27,11 @@ if not exist "%~dp0dev\EBOOT.ELF" (
 )
 
 if not exist "%~dp0analysis\run\hdd0" mkdir "%~dp0analysis\run\hdd0"
+if not exist "%~dp0analysis\run\hdd1" mkdir "%~dp0analysis\run\hdd1"
 
 set "PS3_VFS_ROOT=%ROOT%dev/BCES00511"
 set "PS3_HDD0_ROOT=%ROOT%analysis/run/hdd0"
+set "PS3_HDD1_ROOT=%ROOT%analysis/run/hdd1"
 set "RACACIT_LOG_FILE=%ROOT%analysis/run/game.log"
 set "RACACIT_LANGUAGE=%LINGUA%"
 

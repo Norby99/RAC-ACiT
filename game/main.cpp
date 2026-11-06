@@ -832,6 +832,12 @@ static void map_cellfs_devices(void)
         cellfs_add_path_mapping("/dev_bdvd/", m);
         cellfs_add_path_mapping("/dev_hdd1/", m);
     }
+    /* The game cache: outside the disc dump, which stays read-only. */
+    const char* hdd1 = getenv("PS3_HDD1_ROOT");
+    if (hdd1 && *hdd1 && _fullpath(abs, hdd1, sizeof abs)) {
+        snprintf(m, sizeof m, "%s/", abs);
+        cellfs_add_path_mapping("/dev_hdd1/", m);
+    }
     const char* hdd0 = getenv("PS3_HDD0_ROOT");
     if (hdd0 && *hdd0 && _fullpath(abs, hdd0, sizeof abs)) {
         snprintf(m, sizeof m, "%s/", abs);
@@ -842,6 +848,11 @@ static void map_cellfs_devices(void)
     if (realpath(ppu_vfs_root, abs)) {
         snprintf(m, sizeof m, "%s/", abs);
         cellfs_add_path_mapping("/dev_bdvd/", m);
+        cellfs_add_path_mapping("/dev_hdd1/", m);
+    }
+    const char* hdd1 = getenv("PS3_HDD1_ROOT");
+    if (hdd1 && *hdd1 && realpath(hdd1, abs)) {
+        snprintf(m, sizeof m, "%s/", abs);
         cellfs_add_path_mapping("/dev_hdd1/", m);
     }
     const char* hdd0 = getenv("PS3_HDD0_ROOT");
@@ -1450,7 +1461,7 @@ static void windows_setup(int* argc, char*** argv)
 }
 #endif
 
-#ifdef __ANDROID__
+#if defined(__linux__) /* Android too */
 /* SDLActivity calls SDL_main on a Java thread with a ~1 MB stack, and the
  * primary guest thread runs on whatever thread calls ppu_run(). Lifted code
  * recurses as deep as the title does, so give it the same 256 MB the runtime

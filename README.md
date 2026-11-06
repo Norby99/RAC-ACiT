@@ -41,3 +41,12 @@ This is a work in progress.
 
 RACiT is an unofficial project and is not affiliated with Sony, Insomniac Games, or the game's rights holders.
 Saves are currently not transferable between windows and android. Feature will be added in the future to sync saves between devices
+
+## Thanks
+
+This version for the European disc (`BCES00511`) exists thanks to two projects:
+
+- [RACiT](https://github.com/HighDrexler/RACiT) by HighDrexler, the port this version is built on.
+- [ps3recomp](https://github.com/sp00nznet/ps3recomp) by sp00nznet, the static recompilation toolkit behind it.
+
+Thank you for your work.

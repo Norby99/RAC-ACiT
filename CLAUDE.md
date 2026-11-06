@@ -25,12 +25,13 @@ Aggiornamento: pipeline e compilazione riuscite (`game/build-win/game/RaCACiT.ex
 il gioco parte, carica `front_end` e presenta circa 60 frame al secondo secondo i log, ma nessuno ha ancora
 guardato lo schermo né provato i comandi o un livello.
 
-Aggiornamento: provato a mano in italiano con `avvia.bat`, l'utente conferma che funziona tutto.
-La lingua si sceglie in `avvia.bat` (tabella in `README_LINGUE.md`).
+Aggiornamento: provato a mano in italiano con `run.bat`, l'utente conferma che funziona tutto.
+La lingua si sceglie in `run.bat` (tabella in `README_LINGUE.md`).
 
-Obiettivo successivo: spostare il progetto su Linux con una build nativa, senza Proton. RACiT dichiara una
-build Linux di debug non pubblica; il codice ha il percorso Vulkan per Linux, ma `setup_windows.sh`,
-`windows/` e il launcher sono solo per Windows. Non è ancora stata provata.
+Obiettivo successivo: provare su Linux la build nativa, senza Proton. Script e istruzioni sono in `LINUX.md`,
+`linux/`, `scripts/setup_linux.sh`, `scripts/build_linux.sh` e `run.sh`. La prova con zig da Windows compila
+tutto e al link mancano solo i simboli SDL2, assenti nella prova. Non è mai stata avviata su Linux.
+La cache del gioco ora va in `PS3_HDD1_ROOT` (`analysis/run/hdd1`), fuori dal dump: verificato su Windows.
 
 Per avviarlo a mano: `PS3_VFS_ROOT=<percorso>/dev/BCES00511`, `PS3_HDD0_ROOT=analysis/run/hdd0`,
 `RACACIT_LOG_FILE=analysis/run/game.log`, con `dev/EBOOT.ELF` come argomento.
@@ -143,8 +144,10 @@ prompt dei pulsanti). Prima il gioco deve avviarsi e arrivare in gioco; gli extr
 
 - Tutti i file del gioco e della PS3 stanno in `dev/`, mai altrove. `dev/` è ignorata da git; attenzione
   a non confonderla con `scripts/dev/`, che è codice del progetto.
-- **Mai pubblicare o committare dati del gioco o derivati**: `dev/` e il codice generato (`out/`,
-  `analysis/`, `game/src/recomp/`, `game/spu/`, `game/build*/`). `tools/` resta ignorato.
+- **Mai committare o pubblicare codice di gioco generato**: violerebbe il copyright. Vale per `dev/`,
+  `out/`, `analysis/`, `game/src/recomp/`, `game/spu/`, `game/prx/`, `game/build*/`, per binari e asset.
+  Prima di ogni commit controllare l'elenco dei file. `tools/` resta ignorato. Nel repository vanno solo
+  sorgenti scritti a mano e script: il codice del gioco si rigenera dalla copia di ciascuno.
 - Mai modificare a mano il codice generato: ogni correzione passa da `patch_lift.py` o da `game/`, così
   sopravvive a un nuovo lift.
 - Le modifiche al runtime in `tools/ps3recomp` vanno salvate nel file patch, come spiegato in `BUILDING.md`.

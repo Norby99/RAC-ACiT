@@ -1,17 +1,17 @@
 # Lingue del gioco
 
-Questo port usa il disco europeo `BCES00511`. La lingua si sceglie in [avvia.bat](avvia.bat).
+Questo port usa il disco europeo `BCES00511`. La lingua si sceglie in [run.bat](run.bat).
 
 ## Come cambiare lingua
 
-1. Apri `avvia.bat` con il Blocco note.
+1. Apri `run.bat` con il Blocco note.
 2. Cambia il valore in questa riga, in alto:
 
    ```bat
    set "LINGUA=it"
    ```
 
-3. Salva e avvia il gioco con un doppio clic su `avvia.bat`.
+3. Salva e avvia il gioco con un doppio clic su `run.bat`.
 
 ## Lingue disponibili
 
