@@ -21,6 +21,22 @@ Il progetto è un repository git solo locale: `main` parte dalla storia di RACiT
 committate). Il lift PPU e `patch_lift.py` girano sul mio ELF; lift SPU, compilazione ed esecuzione sono
 ancora da provare.
 
+Aggiornamento: pipeline e compilazione riuscite (`game/build-win/game/RaCACiT.exe`). In un test di 60 s
+il gioco parte, carica `front_end` e presenta circa 60 frame al secondo secondo i log, ma nessuno ha ancora
+guardato lo schermo né provato i comandi o un livello.
+
+Aggiornamento: provato a mano in italiano con `avvia.bat`, l'utente conferma che funziona tutto.
+La lingua si sceglie in `avvia.bat` (tabella in `README_LINGUE.md`).
+
+Obiettivo successivo: spostare il progetto su Linux con una build nativa, senza Proton. RACiT dichiara una
+build Linux di debug non pubblica; il codice ha il percorso Vulkan per Linux, ma `setup_windows.sh`,
+`windows/` e il launcher sono solo per Windows. Non è ancora stata provata.
+
+Per avviarlo a mano: `PS3_VFS_ROOT=<percorso>/dev/BCES00511`, `PS3_HDD0_ROOT=analysis/run/hdd0`,
+`RACACIT_LOG_FILE=analysis/run/game.log`, con `dev/EBOOT.ELF` come argomento.
+Attenzione: `map_cellfs_devices` in `game/main.cpp` mappa `/dev_hdd1/` sulla stessa radice del disco, quindi
+il gioco crea `cache/BCES00511/` dentro il dump. Va rimappata fuori da `dev/` prima dei prossimi test.
+
 La mappa è in `scripts/addr_map_usa_eu.tsv`, generata da `scripts/dev/port_addresses.py` (uso una tantum
 sui sorgenti USA: non rilanciarlo). Il codice si sposta a blocchi da `+0x0` a `+0x628`, il codice SPU di
 `+0x800`, dati finali e bss di `+0x100`, il pool vicino a `0xD2F...` di `+0xC0`.
