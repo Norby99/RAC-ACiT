@@ -112,14 +112,14 @@ extern uint32_t ppu_vm_size;                  /* ppu_loader.cpp: the OOB guard *
 
 /* At a stall: the state of the game's SPU job queues, always (owner logs have
  * no RACACIT_STALL_PEEK). The open "job posted, never taken" freeze (v40 level
- * 14, v91 Vorselon: main thread in job_wait func_00696614, every lane idle)
+ * 14, v91 Vorselon: main thread in job_wait func_00696C10, every lane idle)
  * needs which queue the wait is on and what each side thinks it holds.
- *   igPm block B = [[0xD2FAA4] - 0x8000] (0x00FBE680): per queue q (0-4),
+ *   igPm block B = [[0xD2FB64] - 0x8000] (0x00FBE780): per queue q (0-4),
  *   done count B+0x9480+0x80q, posted count B+0x9700+0x80q (job_submit
- *   func_00695E84), kick-line pointer B+0x9994+4q, B+0x99A8+4q.
- *   Handle (func_00696614): bits 0-9 target count, 10-12 queue, 13 = the
- *   other path, 14+ frame; moby_prerender waits on [[0xD2F988] - 0x7FD8] + 0x3B0.
- *   Job manager lines 0x00F3CE00/E80/F00 (the v40 freeze's record and queue). */
+ *   func_00696480), kick-line pointer B+0x9994+4q, B+0x99A8+4q.
+ *   Handle (func_00696C10): bits 0-9 target count, 10-12 queue, 13 = the
+ *   other path, 14+ frame; moby_prerender waits on [[0xD2FA48] - 0x7FD8] + 0x3B0.
+ *   Job manager lines 0x00F3CF00/E80/F00 (the v40 freeze's record and queue). */
 static uint32_t stall_be32(uint32_t ea)
 {
     if (!vm_base || ea < 0x10000u || ea + 4 > ppu_vm_size) return 0;
@@ -138,7 +138,7 @@ static void stall_line(const char* what, uint32_t ea)
 
 static void racacit_stall_jobs_dump(void)
 {
-    const uint32_t b = stall_be32(stall_be32(0xD2FAA4u) - 0x8000u);
+    const uint32_t b = stall_be32(stall_be32(0xD2FB64u) - 0x8000u);
     if (b) {
         fprintf(stderr, "[stall-jobs] igPm block 0x%08X, frame word %08X%c", b, stall_be32(b + 4), 10);
         for (uint32_t q = 0; q < 5; q++)
@@ -150,16 +150,16 @@ static void racacit_stall_jobs_dump(void)
             if (k) stall_line("kick", k);
         }
     }
-    const uint32_t m = stall_be32(stall_be32(0xD2F988u) - 0x7FD8u);
+    const uint32_t m = stall_be32(stall_be32(0xD2FA48u) - 0x7FD8u);
     if (m) {
         /* A doubleword, zeroed by job_wait once the job is done: non-zero = still waited on. */
         const uint32_t hi = stall_be32(m + 0x3B0), h = stall_be32(m + 0x3B4);
         fprintf(stderr, "[stall-jobs] moby_prerender handle %08X%08X: queue %u target %u%s frame %u%c",
                 hi, h, (h >> 10) & 7, h & 0x3FF, (h & 0x2000) ? " (other path)" : "", h >> 14, 10);
     }
-    stall_line("jobmgr", 0x00F3CE00u);
-    stall_line("jobmgr", 0x00F3CE80u);
     stall_line("jobmgr", 0x00F3CF00u);
+    stall_line("jobmgr", 0x00F3CF80u);
+    stall_line("jobmgr", 0x00F3D000u);
 }
 
 /* Guest-callback dispatch. g_ps3_guest_caller is the hook the HLE runtime

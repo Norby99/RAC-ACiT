@@ -3,7 +3,7 @@
 
 igPm loads a job at LS 0x100, and a job may load further job modules above
 itself at a base of its own choosing (39 of them live in the EBOOT's data
-segment, 0xDB4180..0xDDD380, outside lift_spu_jobs.py's main scan). Those ran
+segment, 0xDB4280..0xDDD480, outside lift_spu_jobs.py's main scan). Those ran
 in the SPU interpreter: one second per frame in the Great Clock.
 
 Reads the local-store snapshots the runtime writes with SPU_DUMP_JOBS=<dir>
@@ -72,7 +72,7 @@ def read_table():
 
 def main():
     dump_dir = sys.argv[1]
-    elf = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "input", "EBOOT.ELF")
+    elf = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "dev", "EBOOT.ELF")
     d, sg = load_elf(elf)
     heads = all_headers(d, sg)
     by_code = {}

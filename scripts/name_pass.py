@@ -3,7 +3,7 @@
 
 Merges on top of out/ghidra_names.json (string-derived names) in the
 ghidra_names.py format the lifter's --names flag reads:
-    { "0x000CAA08": {"label": ..., "cident": ..., "src": ...}, ... }
+    { "0x000CAAE4": {"label": ..., "cident": ..., "src": ...}, ... }
 
 Priority: import > tolua_api > tolua > string.
 
@@ -38,46 +38,46 @@ sceNpManagerGetAvatarUrl sceNpManagerRequestTicket
 # tolua++ runtime entry points (code addresses), identified from their call
 # shapes in the generated tolua_*_open functions.
 TOLUA_API = {
-    0x53E670: "tolua_module",
-    0x53DAFC: "tolua_beginmodule",
-    0x53DAD4: "tolua_endmodule",
-    0x53E454: "tolua_cclass",
-    0x53DF74: "tolua_function",
-    0x53DD78: "tolua_variable",
-    0x53DBC4: "tolua_array",
-    0x53E00C: "tolua_constant",
-    0x53E87C: "tolua_usertype",
+    0x53EC98: "tolua_module",
+    0x53E124: "tolua_beginmodule",
+    0x53E0FC: "tolua_endmodule",
+    0x53EA7C: "tolua_cclass",
+    0x53E59C: "tolua_function",
+    0x53E3A0: "tolua_variable",
+    0x53E1EC: "tolua_array",
+    0x53E634: "tolua_constant",
+    0x53EEA4: "tolua_usertype",
 }
 # Hand-identified from Ghidra decompiles (analysis/decomp_*.txt).
 MANUAL = {
-    0x695F60: "job_submit",              # generic SPU job submit, returns a handle (33 callers)
-    0x696614: "job_wait",                # wait on one job handle: 1 ms spin, then usleep(30)
-    0x660818: "batch_last_submitted",    # obj+0x318 - 1 under an lv2 mutex
-    0x660924: "batch_wait",              # poll obj+0x31C >= id, usleep(100) per spin
-    0x5C52A8: "batch_drain_all",         # wait for every submitted batch, then func_005C50AC(0x41)
-    0x4DFDF0: "render_build_views",      # per-view frame build: ~9 submit/wait round trips
-    0x677AD0: "r2o_init",                # igR2O job descriptor (SPU code 0xB04E80, prio 0x4040FFFF)
-    0x677C0C: "r2o_kick",                # submit the R2O job when [base]+0x29A is set
-    0x677B44: "r2o_complete",            # job_wait on the R2O handle, post-process results
-    0x677AA4: "r2o_reset",
-    0x677950: "r2o_post",
-    0x94F178: "r2o_frame_kick",          # func_00671CB8 then r2o_kick
+    0x69655C: "job_submit",              # generic SPU job submit, returns a handle (33 callers)
+    0x696C10: "job_wait",                # wait on one job handle: 1 ms spin, then usleep(30)
+    0x660E18: "batch_last_submitted",    # obj+0x318 - 1 under an lv2 mutex
+    0x660F24: "batch_wait",              # poll obj+0x31C >= id, usleep(100) per spin
+    0x5C58D0: "batch_drain_all",         # wait for every submitted batch, then func_005C56D4(0x41)
+    0x4E03A4: "render_build_views",      # per-view frame build: ~9 submit/wait round trips
+    0x6780CC: "r2o_init",                # igR2O job descriptor (SPU code 0xB05680, prio 0x4040FFFF)
+    0x678208: "r2o_kick",                # submit the R2O job when [base]+0x29A is set
+    0x678140: "r2o_complete",            # job_wait on the R2O handle, post-process results
+    0x6780A0: "r2o_reset",
+    0x677F4C: "r2o_post",
+    0x94F778: "r2o_frame_kick",          # func_006722B4 then r2o_kick
     # The other submit/wait pairs in render_build_views, named by the "igXxx"
     # job string their module references (pairs share module TOC data).
-    0x5F9C48: "tie_submit",              0x5F9900: "tie_wait",
-    0x649D7C: "moby_prerender_submit",   0x645994: "moby_prerender_wait",
-    0x660090: "particle_submit",         0x65EF80: "particle_wait",
-    0x5D113C: "index_trim_submit",       0x5D0D38: "index_trim_wait",
-    0x64F31C: "moby_particle_submit",    0x67D7E4: "guppy_prerender_submit",
-    0x61E1BC: "loose_att_wait",          0x662CE8: "render_mats_wait",
-    0x54FB18: "anim_vert_wait",
+    0x5FA270: "tie_submit",              0x5F9F28: "tie_wait",
+    0x64A37C: "moby_prerender_submit",   0x645F94: "moby_prerender_wait",
+    0x660690: "particle_submit",         0x65F580: "particle_wait",
+    0x5D1764: "index_trim_submit",       0x5D1360: "index_trim_wait",
+    0x64F91C: "moby_particle_submit",    0x67DDE0: "guppy_prerender_submit",
+    0x61E7BC: "loose_att_wait",          0x6632E8: "render_mats_wait",
+    0x550140: "anim_vert_wait",
     # Moby jobs (descriptor table at 0xCA38CC: code EA + name; SPU image job_<EA>).
-    0x644FC0: "moby_consts_submit",      0x644F74: "moby_consts_wait",        # job_B63680, handle +0x388
-    0x647F60: "moby_bsphere_submit",     0x645C18: "moby_bsphere_wait",       # job_B89800, handle +0x900
-    0x623580: "moby_bsphere_visible",    # PPU pre-pass sphere test on moby+0x70 before MobyPreRender
+    0x6455C0: "moby_consts_submit",      0x645574: "moby_consts_wait",        # job_B63E80, handle +0x388
+    0x648560: "moby_bsphere_submit",     0x646218: "moby_bsphere_wait",       # job_B8A000, handle +0x900
+    0x623B80: "moby_bsphere_visible",    # PPU pre-pass sphere test on moby+0x70 before MobyPreRender
 }
 # Generated package open functions (reference "tolua: embedded Lua code").
-TOLUA_OPEN = [0x51CE4, 0x25BA20, 0x2957C4, 0x51AFBC]
+TOLUA_OPEN = [0x51D28, 0x25BC00, 0x2959A4, 0x51B5E4]
 
 
 def key(a):

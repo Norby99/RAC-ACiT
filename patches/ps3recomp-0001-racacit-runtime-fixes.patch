@@ -27392,7 +27392,7 @@ index e73a151..cc6c8e2 100644
 +          fprintf(stderr, "[HOTREAD16] spinning on 0x%08X val=0x%04X guest-fn=0x%08X\n", (uint32_t)a,
 +                  __builtin_bswap16(v), ppu_prof_resolve_host(__builtin_return_address(0)));
 +          { const char* ke = getenv("RACACIT_KICK_EXIT");   /* experiment: request job manager exit */
-+            if (ke && (uint32_t)a == 0x00F3CE18u) { static int kicked = 0; if (!kicked++) {
++            if (ke && (uint32_t)a == 0x00F3CF18u) { static int kicked = 0; if (!kicked++) {
 +                uint32_t f; memcpy(&f, vm_base + 0xF3CF30, 4); f = __builtin_bswap32(f) | 0x40000000u;
 +                f = __builtin_bswap32(f); memcpy(vm_base + 0xF3CF30, &f, 4);
 +                fprintf(stderr, "[racacit] KICK: set exit bit in F3CF30\n"); } } }
@@ -34101,7 +34101,7 @@ index d8f4081..c4ff4f6 100644
 +     * each one acknowledges (func_00997840, called from 0x00999868). One poll
 +     * that comes too early cost the main thread a whole 100 ms: the hitch while
 +     * playing. Poll every 1 ms there instead; the loop re-checks its flag. */
-+    if (usec == 100000 && (uint32_t)ctx->lr == 0x0099986Cu) usec = 1000;
++    if (usec == 100000 && (uint32_t)ctx->lr == 0x00999E6Cu) usec = 1000;
 +
  #ifdef _WIN32
      /* Use high-resolution sleep via waitable timer for better precision */

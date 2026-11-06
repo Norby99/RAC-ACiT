@@ -5,7 +5,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-mkdir -p tools input
+mkdir -p tools dev
 
 # pin <dir> <repository> <commit or tag>
 pin() {

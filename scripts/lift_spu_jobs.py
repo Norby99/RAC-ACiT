@@ -10,7 +10,7 @@ registers the functions and declares each image an overlay
 (spu_register_overlay_image): the runtime serves a job's lifted code only when
 the local store holds that job's GUID and code words.
 
-Usage: scripts/lift_spu_jobs.py [input/EBOOT.ELF] [--only 0xB9B580,0xB8A980,...]
+Usage: scripts/lift_spu_jobs.py [dev/EBOOT.ELF] [--only 0xB9BD80,0xB8B180,...]
 """
 import os, struct, subprocess, sys
 
@@ -19,17 +19,17 @@ PS3R = os.path.join(ROOT, "tools", "ps3recomp", "tools")
 JOB_BASE = 0x100
 IMAGE_ID_BASE = 200
 # Raw job region (ELF images follow). Starts just past igPm's own runtime and
-# policy module (0xAD8F80 / 0xAD9500, handled by EXTRA_BLOCKS / the PM lift):
-# Bink's SPU video decoder lives at 0xADB700 and the old 0xB00000 start missed
+# policy module (0xAD9780 / 0xAD9D00, handled by EXTRA_BLOCKS / the PM lift):
+# Bink's SPU video decoder lives at 0xADBF00 and the old 0xB00000 start missed
 # it, so every movie frame was decoded by the SPU interpreter.
-SCAN_LO, SCAN_HI = 0xAD9780, 0xBE3C80
+SCAN_LO, SCAN_HI = 0xAD9F80, 0xBE4480
 MAX_SIZE = 0x30000
 # SPU ELF jobs already lifted by build_spu_workloads (image id, text EA, size,
 # LS base): the WWS job manager stages them into a code buffer at LS 0x4000,
 # so they too must be found by content. Sealed at boot from guest memory.
 ELF_OVERLAYS = [
-    (2, 0xBFD480, 0xDC30, 0x4000),   # nextsynth (SCREAM synth job)
-    (3, 0xC0BB80, 0xB5D0, 0x4000),   # lr1 (reverb job)
+    (2, 0xBFDC80, 0xDC30, 0x4000),   # nextsynth (SCREAM synth job)
+    (3, 0xC0C380, 0xB5D0, 0x4000),   # lr1 (reverb job)
 ]
 
 
@@ -70,7 +70,7 @@ def find_headers(d, sg):
 # (its job-loading/lock-line polling runtime); unlifted, every SPURS worker
 # spun in the interpreter there. Written to game/spu/spu_extra.c by --extra.
 EXTRA_BLOCKS = [
-    ("igpm_rt", 0xAD8F80, 0x580, 0x3F580, 150),
+    ("igpm_rt", 0xAD9780, 0x580, 0x3F580, 150),
 ]
 # Lifter hints per block: job-style entry after the GUID header (not found by
 # --auto-functions), and where code ends (variables follow).
@@ -171,7 +171,7 @@ SUB_IMAGE_ID_BASE = 400
 SUB_ANCHOR = 0x30
 SUB_ENTRIES = os.path.join(ROOT, "scripts", "spu_submodule_entries.txt")
 # Modules found at a second base that have their own lift already.
-SUB_SKIP = {(0xC17B00, 0xA00), (0xAD8F80, 0x3F580)}
+SUB_SKIP = {(0xC18300, 0xA00), (0xAD9780, 0x3F580)}
 
 
 def read_starts():
@@ -291,12 +291,12 @@ def main():
         return merge_starts(sys.argv[sys.argv.index("--merge-starts") + 1])
     if "--sub" in sys.argv:
         args = [a for a in sys.argv[1:] if not a.startswith("--")]
-        elf = args[0] if args else os.path.join(ROOT, "input", "EBOOT.ELF")
+        elf = args[0] if args else os.path.join(ROOT, "dev", "EBOOT.ELF")
         d = open(elf, "rb").read()
         return main_sub(d, segs(d))
     if "--extra" in sys.argv:
         args = [a for a in sys.argv[1:] if not a.startswith("--")]
-        elf = args[0] if args else os.path.join(ROOT, "input", "EBOOT.ELF")
+        elf = args[0] if args else os.path.join(ROOT, "dev", "EBOOT.ELF")
         d = open(elf, "rb").read()
         return main_extra(d, segs(d))
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
@@ -304,7 +304,7 @@ def main():
     if "--only" in sys.argv:
         only = {int(x, 16) for x in sys.argv[sys.argv.index("--only") + 1].split(",")}
         args = [a for a in args if not a.startswith("0x")]
-    elf = args[0] if args else os.path.join(ROOT, "input", "EBOOT.ELF")
+    elf = args[0] if args else os.path.join(ROOT, "dev", "EBOOT.ELF")
     d = open(elf, "rb").read()
     sg = segs(d)
     heads = find_headers(d, sg)

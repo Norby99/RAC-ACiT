@@ -8,7 +8,7 @@ The lifter lowered most AltiVec instructions as a loop writing vD lane by lane
 through a pointer into ctx->vr. When vD is also vA, vB or vC, lanes of the
 source are overwritten before they are read -- the hardware reads every
 source first. The case that showed it is vcmpequh. in A Crack in Time's
-texture streamer (func_005E3584, a vectorised search of a u16 id table):
+texture streamer (func_005E3BAC, a vectorised search of a u16 id table):
 
     d[i] = a[i]==b[i] ? ~0 : 0;  t += a[i]==b[i];      (vcmpequh. v0,v1,v0)
 

@@ -12,7 +12,7 @@ its lifted code by an FNV-1a-64 fingerprint over the raw PM bytes
   3. writes game/spu/policy_modules.c, registering each lift under the same
      fingerprint the runtime computes.
 
-Usage: scripts/lift_policy_modules.py input/EBOOT.ELF
+Usage: scripts/lift_policy_modules.py dev/EBOOT.ELF
 """
 import json, os, struct, subprocess, sys
 
@@ -23,8 +23,8 @@ IMAGE_ID_BASE = 100   # clear of build_spu_workloads' 1..N
 
 # name, guest address, size  (from boot log AddWorkload lines)
 MODULES = [
-    ("pm_wwsjob", 0x00C17B00, 11520),   # "Wws_Job" SPURS job manager
-    ("pm_igpm",   0x00AD9500, 560),     # Insomniac "igPm"
+    ("pm_wwsjob", 0x00C18300, 11520),   # "Wws_Job" SPURS job manager
+    ("pm_igpm",   0x00AD9D00, 560),     # Insomniac "igPm"
 ]
 
 
@@ -51,7 +51,7 @@ def read_guest(elf_path, addr, size):
 
 
 def main():
-    elf = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "input", "EBOOT.ELF")
+    elf = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "dev", "EBOOT.ELF")
     out_raw = os.path.join(ROOT, "out", "policy_modules")
     spu_dir = os.path.join(ROOT, "game", "spu")
     os.makedirs(out_raw, exist_ok=True)

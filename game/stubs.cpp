@@ -134,8 +134,8 @@ extern "C" void ps3_load_prx_modules(void)
  * -----------------------------------------------------------------------*/
 
 /*
- *   // Skip an integrity check at guest address 0x00812FA0
- *   ps3::patches::nop_range(0x00812FA0, 0x00812FB0);
+ *   // Skip an integrity check at guest address 0x008135A0
+ *   ps3::patches::nop_range(0x008135A0, 0x008135B0);
  *
  *   // Replace a function call with a direct return
  *   ps3::patches::force_return(0x009A1000, 0);  // return 0
@@ -258,7 +258,7 @@ extern "C" void racacit_register_language(void)   /* main.cpp, after ppu_hle_ini
  *
  * The bolt trophies -- 24 For a Rainy Day (10,000), 25 Greed is Good
  * (50,000), 31 Retirement Fund (250,000), 34 Thrifty (1,000,000) -- are asked
- * for by func_00169EDC from the game's stat 11 (bolts collected), for the
+ * for by func_00169FB0 from the game's stat 11 (bolts collected), for the
  * highest tier that stat is in ONLY: > 999,999 -> 34, else > 249,999 -> 31,
  * else > 49,999 -> 25, else > 9,999 -> 24. On a console the stat passes each
  * tier on its way up. A save already past a tier whose trophy was lost (RACiT
@@ -282,7 +282,7 @@ extern "C" void racacit_register_trophies(void)   /* main.cpp, after ppu_hle_ini
 }
 
 extern "C" const char* racacit_lua_last_exec(void);
-/* racacit: luaD_throw (0x50A83C) hook -- print the error object (Lua 5.1
+/* racacit: luaD_throw (0x50AE64) hook -- print the error object (Lua 5.1
  * layout: L->top at +8, 16-byte TValue with tt at +8, TString body at +16). */
 extern "C" uint32_t vm_read32(uint64_t a);
 extern "C" void racacit_lua_throw_hook(ppu_context* ctx)
@@ -391,7 +391,7 @@ static void racacit_lua_file(ppu_context* ctx, uint32_t L);
 extern "C" void ds_player_stop_lines(int all);
 extern "C" void ds_player_stream_pause(uint32_t stream, int on);
 extern "C" unsigned long long ps3_qpc_us(void);
-/* func_0099B4E0, SCREAM's stream pause callback (r3 the stream, r4 paused), patched in by
+/* func_0099BAE0, SCREAM's stream pause callback (r3 the stream, r4 paused), patched in by
  * patch_lift.py. It fires for every stream at every start too, paused then resumed: only a
  * stream that stays paused means anything (ds_player.c). RACACIT_DS_DEBUG=1 logs them. */
 extern "C" void racacit_stream_pause_hook(ppu_context* ctx)
@@ -467,11 +467,11 @@ extern "C" void racacit_luac_trace(ppu_context* ctx, const char* name)
 /* ---------------------------------------------------------------------------
  * Per-object shadow maps: a caster's view-space box must be current
  *
- * func_005EDEE8 fits each shadow-casting moby's shadow map to the box at
+ * func_005EE510 fits each shadow-casting moby's shadow map to the box at
  * moby+0xA0/+0xB0 -- the moby's bounds in CAMERA space (the bounds SPU job,
  * GUID 429de002, rotates them by the camera quaternion in the block at
- * 0x00F5D680). That job only revisits mobies that queued themselves for an
- * update this frame (the list func_00647F60 builds), so a static object keeps
+ * 0x00F5D780). That job only revisits mobies that queued themselves for an
+ * update this frame (the list func_00648560 builds), so a static object keeps
  * the box of the camera it was first seen from. In Zolar Forest the crashed
  * ship's box was computed at load; once the camera moved its 1024x1024 shadow
  * map was fitted to empty space and its sun shadow never appeared.
@@ -496,9 +496,9 @@ extern "C" void racacit_caster_box(uint32_t moby)
     const float sx = racacit_rdf(moby + 0x70), sy = racacit_rdf(moby + 0x74),
                 sz = racacit_rdf(moby + 0x78), r = racacit_rdf(moby + 0x7C);
     if (!(r > 0.0f) || r > 1.0e4f) return;
-    /* The camera rotation the bounds job uses (x y z w at 0x00F5D690). */
-    const float x = racacit_rdf(0x00F5D690), y = racacit_rdf(0x00F5D694),
-                z = racacit_rdf(0x00F5D698), w = racacit_rdf(0x00F5D69C);
+    /* The camera rotation the bounds job uses (x y z w at 0x00F5D790). */
+    const float x = racacit_rdf(0x00F5D790), y = racacit_rdf(0x00F5D794),
+                z = racacit_rdf(0x00F5D798), w = racacit_rdf(0x00F5D79C);
     const float n2 = x * x + y * y + z * z + w * w;
     if (!(n2 > 0.98f && n2 < 1.02f)) return;
     const float cx = (1 - 2 * (y * y + z * z)) * sx + 2 * (x * y - z * w) * sy + 2 * (x * z + y * w) * sz;
@@ -534,10 +534,10 @@ extern "C" void racacit_caster_box(uint32_t moby)
  * Start skips any pre-rendered movie (RACACIT_START_SKIPS_MOVIES, default on)
  *
  * Insomniac's movie layer keeps a table of 32-byte slots: slot+0 is the BINK*,
- * slot+8 "stopped", slot+9 "loop". func_006511BC is the per-frame update for a
+ * slot+8 "stopped", slot+9 "loop". func_006517BC is the per-frame update for a
  * slot and returns 1 while the movie is still playing, 0 once it has ended --
  * its caller then stops and closes it. scripts/patch_lift.py routes that
- * return value and every BinkOpen (func_009A8798, called from func_0065282C)
+ * return value and every BinkOpen (func_009A8D98, called from func_00652E2C)
  * through the two hooks below. A START press during a one-shot movie makes
  * the update report "ended", so the game's own end-of-movie path runs exactly
  * as when the last frame plays. Looping movies (the title screen's backdrop)
@@ -649,16 +649,16 @@ extern "C" void racacit_force_abort(uint32_t opts, int kind)
  * End-of-frame blit: the RSX must take the return JUMP before the scratch
  * packet is reused
  *
- * func_005F3E50 ends every level frame like this (addresses from a trace):
+ * func_005F4478 ends every level frame like this (addresses from a trace):
  *   - a cellGcmSetTransferImage packet is built in scratch memory
  *     (0x2003C780, 0x68 bytes) with a return JUMP after it (0x2003C7E8);
  *   - the word at the RSX's parked position in one main command buffer is
  *     patched to JUMP into the packet, put = the packet's end;
- *   - it waits for the RSX to go idle (func_0066117C);
+ *   - it waits for the RSX to go idle (func_0066177C);
  *   - put = the other main buffer + 0x24, which is where the return JUMP
  *     leads, so the RSX takes it and is idle again;
  *   - it returns WITHOUT waiting, and the scratch is handed to the next user
- *     (func_0054CBC4 builds SPU job descriptors at the same address).
+ *     (func_0054D1EC builds SPU job descriptors at the same address).
  * A real RSX takes that JUMP microseconds after the put write. Our walker ran
  * milliseconds later, read the next tenant's data where the JUMP had been (a
  * pointer 0x20044980 -- which decodes as JUMP 0x44980, a pointer table) and
@@ -682,12 +682,12 @@ extern "C" void racacit_gcm_put_moved(int wait)
 
 /* -------------------------------------------------------------------------
  * Test hook: RACACIT_START_LEVEL=<id> (dev testing only, unset by default).
- * func_0029A4F4(level, ...) is the title's level change: it stores the id in
- * the current-level global (0xEF7C90, via func_0032A1B0) and starts the load.
+ * func_0029A6D4(level, ...) is the title's level change: it stores the id in
+ * the current-level global (0xEF7D90, via func_0032A3D4) and starts the load.
  * The first change to a real level (id 1..0x15) after boot is redirected to
  * the given id, so LOAD on any save goes straight to that level -- e.g. 2 =
  * zolar_forest, the first Ratchet level. Ids come from the name table at
- * 0xDE1820 (1 great_clock_a, 2 zolar_forest, 3 space_sector_1, ...).
+ * 0xDE1920 (1 great_clock_a, 2 zolar_forest, 3 space_sector_1, ...).
  * patch_lift.py calls this at the function's entry.
  * -----------------------------------------------------------------------*/
 /* "Clank levels: Skip" in the Settings menu (RACACIT_SKIP_CLANK=1): a load into
@@ -711,17 +711,17 @@ extern "C" void racacit_gcm_put_moved(int wait)
  * target (+0x1D4) every frame (func_0003E874): racacit_follow_fov scales the
  * target there (patch_lift.py #18), so a change glides in like the game's own
  * zooms, and the camera manager carries the angle on into the struct at
- * 0x00F511A0 (+0x90) that the picture is drawn from. The scripts'
- * get_follow_cam_fov (func_0022CDC0) gets the angle back unscaled.
- * (Not the view setups that copy 0x00F511A0's +0x90 into a view's +0x110:
- * func_00201A34, func_003309B0, func_004AB328, func_004E5498 run once or
+ * 0x00F512A0 (+0x90) that the picture is drawn from. The scripts'
+ * get_follow_cam_fov (func_0022CF28) gets the angle back unscaled.
+ * (Not the view setups that copy 0x00F512A0's +0x90 into a view's +0x110:
+ * func_00201B54, func_00330D00, func_004AB824, func_004E5AC0 run once or
  * never in play; scaling them changed nothing on screen, v109 tests.)
  *
  * The follow camera eases its distance (+0x1CC)
  * toward a target (+0x1D0) every frame (func_00042558, also func_0003E9F0):
  * racacit_follow_dist scales the target there, so a change glides in, and
  * the camera's own collision still pulls it in at walls. The level scripts'
- * get_follow_cam_dist (func_0022D058) reads +0x1CC: it gets the distance back
+ * get_follow_cam_dist (func_0022D1C0) reads +0x1CC: it gets the distance back
  * unscaled, since the scripts blend from it to their own distances, which
  * are then scaled.
  * -----------------------------------------------------------------------*/
@@ -767,7 +767,7 @@ extern "C" double racacit_follow_dist_unscale(double d)
 /* Armor looks, picked in the game's own Extras > Skins menu (settings.txt
  * RACACIT_ARMOR_LOOK; scripts/patch_lift.py #16 and #17): Ratchet wears the
  * chosen armor's look -- 1 Holoflux, 2 Ectoflux, 3 Thermaflux, 4 Hyperflux --
- * whichever armor he has. Only his part mask (func_001709B4) asks: the damage he
+ * whichever armor he has. Only his part mask (func_00170A88) asks: the damage he
  * takes is the worn armor's, set with it (hero +0x17F8), and the save, the
  * vendor and the menus keep the real level. 0 = the armor worn. A skin still
  * replaces both, as in the game. */
@@ -782,14 +782,14 @@ extern "C" uint32_t racacit_armor_look(uint32_t armor)
     return look ? (uint32_t)look : armor;
 }
 
-/* The Skins menu's list (func_004A3DB4) is the game's skin table: per skin a
+/* The Skins menu's list (func_004A4258) is the game's skin table: per skin a
  * name, a (unused) description, a gold bolt price, unlocked, a menu image and
  * the value its EquipSkin command sends, as six Flash arrays (skinNames ..
  * skinValues), plus skinSelected, the entry marked "equipped". After the
  * game's own entries come four more: the armors' names from the game's armor
- * table in the game's language (the inventory's text: table 0xDF07E0 + 0x320 +
+ * table in the game's language (the inventory's text: table 0xDF08E0 + 0x320 +
  * armor * 0x14, name tag at +4), the armor pictures of the inventory's item
- * view (its itemArmorImage, func_004ADEE8: menu images 71 -- the "None" skin's
+ * view (its itemArmorImage, func_004AE3E4: menu images 71 -- the "None" skin's
  * picture, Ratchet in Holoflux -- 79, 81 and 80; the inventory's small armor
  * icons, images 0x12F..0x132, are not pictures this list can show), free and
  * unlocked, values 101..104. EquipSkin with one of those
@@ -800,15 +800,15 @@ extern "C" uint32_t racacit_armor_look(uint32_t armor)
  * for every save. */
 extern "C" void vm_write64(uint64_t a, uint64_t v);
 static uint32_t s_skin_rows;   /* the game's own entries in the list being built */
-void func_00937A90(ppu_context* ctx);   /* text tag -> entry (+8: the text), 0 if none */
-void func_0095D30C(ppu_context* ctx);   /* movie, name, first index, values, count, 1: a Flash array's entries */
+void func_00938090(ppu_context* ctx);   /* text tag -> entry (+8: the text), 0 if none */
+void func_0095D90C(ppu_context* ctx);   /* movie, name, first index, values, count, 1: a Flash array's entries */
 extern "C" PPU_THREAD_LOCAL void (*g_trampoline_fn)(void*);
 static void racacit_guest_drain(ppu_context* ctx)
 {
     while (g_trampoline_fn) { void (*tf)(void*) = g_trampoline_fn; g_trampoline_fn = 0; tf(ctx); }
 }
 
-/* At loc_004A4DB4, after the list's loop: r23 = the game's entries, r30 = the
+/* At loc_004A5258, after the list's loop: r23 = the game's entries, r30 = the
  * menu's pool, sp+0x80 = skinSelected (undefined or a number), set just after. */
 extern "C" void racacit_skin_armor_selected(ppu_context* ctx)
 {
@@ -837,13 +837,13 @@ extern "C" void racacit_skin_armor_rows(ppu_context* ctx)
     const uint32_t sp = (uint32_t)ctx->gpr[1], nsp = (sp - 0x400u) & ~15u, data = nsp + 0x100u;
     vm_write32(nsp, 0); vm_write32(nsp + 4u, sp);   /* back chain */
 
-    const uint32_t table = vm_read32(pool - 0x7F18u);   /* 0xDF07E0 */
+    const uint32_t table = vm_read32(pool - 0x7F18u);   /* 0xDF08E0 */
     uint32_t name[4];
     for (uint32_t i = 0; i < 4; i++) {
         uint32_t tag = table ? vm_read32(table + 0x320u + (i + 1u) * 0x14u + 4u) : 0u;
         if (!tag) tag = 0xBAu + i;   /* "Holoflux Armor" .. "Hyperflux Armor" */
-        ctx->gpr[1] = nsp; ctx->gpr[3] = tag; ctx->gpr[4] = 0; ctx->lr = 0x004A4EE8u;
-        func_00937A90(ctx); racacit_guest_drain(ctx);
+        ctx->gpr[1] = nsp; ctx->gpr[3] = tag; ctx->gpr[4] = 0; ctx->lr = 0x004A538Cu;
+        func_00938090(ctx); racacit_guest_drain(ctx);
         const uint32_t t = (uint32_t)ctx->gpr[3];
         name[i] = t ? vm_read32(t + 8u) : vm_read32(pool - 0x7F14u);
     }
@@ -862,15 +862,15 @@ extern "C" void racacit_skin_armor_rows(ppu_context* ctx)
             vm_write32(v, 3u); vm_write64(v + 8u, bits);   /* a number */
         }
         ctx->gpr[1] = nsp; ctx->gpr[3] = movie; ctx->gpr[4] = vm_read32(pool - var[a]); ctx->gpr[5] = first;
-        ctx->gpr[6] = arr; ctx->gpr[7] = 4; ctx->gpr[8] = 1; ctx->lr = 0x004A4EE8u;
-        func_0095D30C(ctx); racacit_guest_drain(ctx);
+        ctx->gpr[6] = arr; ctx->gpr[7] = 4; ctx->gpr[8] = 1; ctx->lr = 0x004A538Cu;
+        func_0095D90C(ctx); racacit_guest_drain(ctx);
     }
 
     memcpy(ctx->gpr, gpr, sizeof gpr); memcpy(ctx->fpr, fpr, sizeof fpr); memcpy(ctx->vr, vr, sizeof vr);
     ctx->cr = cr; ctx->lr = lr; ctx->ctr = ctr; ctx->xer = xer; ctx->fpscr = fpscr; ctx->vscr = vscr;
 }
 
-/* EquipSkin's value (func_004A27F8): the game then equips it if it is unlocked. */
+/* EquipSkin's value (func_004A2C9C): the game then equips it if it is unlocked. */
 extern "C" uint32_t racacit_equip_skin(uint32_t skin)
 {
     if (skin >= 101u && skin <= 104u) {
@@ -924,7 +924,7 @@ extern "C" uint32_t racacit_level_change(uint32_t level)
  * next command (the Great Clock D freeze, v91 and v93; docs/dev/HANDOFF.md
  * "RE-DIAGNOSIS").
  *
- * The PPU writes a 160-byte collision command record (0x00F3CE00 in the
+ * The PPU writes a 160-byte collision command record (0x00F3CF00 in the
  * owner's logs) and the broad-phase job (B9B580) posts work items for it. The
  * narrow-phase job CollNarrow (B8A980) runs on several SPU lanes at once: each
  * claims an item, fetches the record, and ends the item by writing the
@@ -961,7 +961,7 @@ extern "C" void spu_coh_unreserve_line(uint32_t ea);
 struct CollRec  { uint32_t ea, gen, done_gen, inc; int done_by, owned, marked; unsigned long long last_prod; };
 struct CollSnap { const void* spu; uint32_t ea, gen, inc; };
 struct CollLog  { int kind, k, done_by; uint32_t ea, type, gen_was, gen_now, done_gen; };
-/* Besides a few fixed records (0x00F3CE00, the one in both owner freezes, is
+/* Besides a few fixed records (0x00F3CF00, the one in both owner freezes, is
  * rewritten every frame) the game cycles through rings of them (0x205DF780,
  * +0xA0, ...): ~4100 distinct ones in Great Clock D, each reused about every
  * 2 s -- far longer than any lane is held up, so they cannot race. Only a
@@ -1123,8 +1123,8 @@ __attribute__((constructor)) static void racacit_collrec_install(void)
 
 /* ---------------------------------------------------------------------------
  * Frame-wait hooks (scripts/patch_lift.py step 10): the entry and the exit
- * of the game's SPU waits -- job_wait func_00696614 and batch_wait
- * func_00660924. render_build_views (func_004DFDF0) makes ~9 submit/wait
+ * of the game's SPU waits -- job_wait func_00696C10 and batch_wait
+ * func_00660F24. render_build_views (func_004E03A4) makes ~9 submit/wait
  * round trips per view per frame. With SPU_KICK_ON_WAIT=1 the entry also
  * wakes the parked SPU lanes (racacit_spu_kick; measured: no effect, so off by
  * default). RACACIT_WAIT_STATS=1 times every wait by its
@@ -1167,7 +1167,7 @@ static std::mutex s_ws_lock;
  * scripts have a debug go() (Axiom: 9 = the boss battle;
  * scripts/gameplay/gameplay_0_global.lua in level_cached.psarc), or
  * "warp(get_hero(), teleporter_ship)". It goes through the game's
- * load-and-pcall func_005004BC (its execute() uses a config state that is
+ * load-and-pcall func_00500AE4 (its execute() uses a config state that is
  * gone after loading): at a script's call into the engine (racacit_luac_trace,
  * r3 = the calling Lua thread), or -- since a level can go a long time
  * without one -- at the main thread's per-frame wait, outside any Lua code,
@@ -1175,7 +1175,7 @@ static std::mutex s_ws_lock;
  * L->l_G at +16, G->mainthread at +100, checked by M->l_G == G). The chunk
  * sits below the guest stack pointer during the call and every register is
  * put back after it. */
-void func_005004BC(ppu_context* ctx);
+void func_00500AE4(ppu_context* ctx);
 extern "C" PPU_THREAD_LOCAL void (*g_trampoline_fn)(void*);
 static volatile uint32_t s_lua_main;
 static const char* racacit_lua_file_path(void)
@@ -1216,7 +1216,7 @@ static void racacit_lua_file(ppu_context* ctx, uint32_t L)
     memcpy(vm_base + str, code, n + 1);
     vm_write32(nsp, 0); vm_write32(nsp + 4, sp);          /* back chain */
     ctx->gpr[1] = nsp; ctx->gpr[3] = L; ctx->gpr[4] = str;
-    func_005004BC(ctx);
+    func_00500AE4(ctx);
     while (g_trampoline_fn) { void (*tf)(void*) = g_trampoline_fn; g_trampoline_fn = 0; tf(ctx); }
     const int status = (int)(int32_t)ctx->gpr[3];
     memcpy(ctx->gpr, gpr, sizeof gpr); memcpy(ctx->fpr, fpr, sizeof fpr); memcpy(ctx->vr, vr, sizeof vr);
@@ -1229,21 +1229,21 @@ extern "C" void racacit_wait_begin(ppu_context* ctx)
     racacit_spu_kick();
     /* The main game thread's context, for the stall watch (main.cpp): it is
      * the one that waits on MobyPreRender every frame. */
-    if ((uint32_t)ctx->lr == 0x006459D0u) { g_racacit_main_ctx = ctx; racacit_lua_file(ctx, s_lua_main); }
+    if ((uint32_t)ctx->lr == 0x00645FD0u) { g_racacit_main_ctx = ctx; racacit_lua_file(ctx, s_lua_main); }
     if (!rac_wait_stats()) return;
     if (t_wait_depth++ == 0) {
         t_wait_t0 = rac_us(); t_wait_lr = (uint32_t)ctx->lr;
-        /* func_00929FFC (resolve a handle and wait until its object is
+        /* func_0092A5FC (resolve a handle and wait until its object is
          * ready) has dozens of callers: key on its caller, whose return
          * address it saved at its frame + 0x90. */
-        if (t_wait_lr == 0x0092A018u) t_wait_lr = vm_read32((uint32_t)ctx->gpr[1] + 0x94u);
-        /* ...and func_004E7D60 is a one-line wrapper of it: its caller. */
-        if (t_wait_lr == 0x004E7D70u) t_wait_lr = vm_read32((uint32_t)ctx->gpr[1] + 0x80u + 0x94u);
+        if (t_wait_lr == 0x0092A618u) t_wait_lr = vm_read32((uint32_t)ctx->gpr[1] + 0x94u);
+        /* ...and func_004E8388 is a one-line wrapper of it: its caller. */
+        if (t_wait_lr == 0x004E8398u) t_wait_lr = vm_read32((uint32_t)ctx->gpr[1] + 0x80u + 0x94u);
         g_racacit_main_wait_lr = t_wait_lr;   /* PS3_SAMPLE_INWAIT */
-        /* RACACIT_SPIN_WATCH=1: for the 6 ms-a-frame wait in func_002A7E88,
+        /* RACACIT_SPIN_WATCH=1: for the 6 ms-a-frame wait in func_002A8068,
          * who sets the object's ready bit (halfword +0x18). */
         static int sw = -1; if (sw < 0) sw = getenv("RACACIT_SPIN_WATCH") ? 1 : 0;
-        if (sw && t_wait_lr == 0x002A7F1Cu) {
+        if (sw && t_wait_lr == 0x002A80FCu) {
             g_racacit_watch_img = -1;
             t_watch_obj = (uint32_t)ctx->gpr[3];
             g_racacit_watch_ea = t_watch_obj + 0x18u;
@@ -1295,8 +1295,8 @@ extern "C" void racacit_wait_end(void)
     }
 }
 
-/* racacit: sound starts (scripts/patch_lift.py #12): tag 0 = func_00577ED8
- * (play a sound spec), 1 = func_0057AEC0 (the backend virtual it ends in,
+/* racacit: sound starts (scripts/patch_lift.py #12): tag 0 = func_00578500
+ * (play a sound spec), 1 = func_0057B4E8 (the backend virtual it ends in,
  * also called directly by the sound-instance layer). RACACIT_SND_TRACE=1
  * logs each new (tag, r4, caller chain) the first time it plays, with the
  * flip count, and the busiest every 5 s -- which code plays what, to pick
@@ -1469,8 +1469,8 @@ extern "C" void racacit_snd_start_end(void)
     t_ds_cat = 0; t_ds_hcat = 0; t_ds_in = 0; t_ds_inst = 0;
 }
 
-/* A sound instance stopped (scripts/patch_lift.py #12: func_006DE478 sets the
- * instance's stopping flag and stops its SCREAM sound, func_006DDC58 stops it
+/* A sound instance stopped (scripts/patch_lift.py #12: func_006DEA78 sets the
+ * instance's stopping flag and stops its SCREAM sound, func_006DE258 stops it
  * at once; r3 = the instance): the controller's copy ends with it. */
 static void racacit_hb_remove(uint32_t inst);
 extern "C" void racacit_snd_stop_hook(ppu_context* ctx, int tag)
@@ -1480,7 +1480,7 @@ extern "C" void racacit_snd_stop_hook(ppu_context* ctx, int tag)
     ds_player_stop((uint32_t)ctx->gpr[3]);
 }
 /* Weapon-aware DualSense triggers (tools/ps3recomp/libs/input/cellPad.c): the
- * equipped weapon id is the word at 0x00E24E78 (the previous one follows it);
+ * equipped weapon id is the word at 0x00E24F78 (the previous one follows it);
  * a weapon's family comes from its fire sounds' names and is remembered per id
  * (seeded with the ids seen on the test save: 17 the Constructo Bomb Glove,
  * 16 the Constructo Pistol, 5 the Sonic Eruptor). */
@@ -1508,7 +1508,7 @@ static void racacit_dsw_event(const char* name)
     static signed char fam[256];
     static int init = 0; static uint32_t last_id = 0xFFFFFFFFu;
     if (!init) { init = 1; memset(fam, -1, sizeof fam); fam[17] = DSW_THROW; fam[16] = DSW_LIGHT; fam[5] = DSW_HEAVY; }
-    const uint32_t id = vm_read32(0x00E24E78u);
+    const uint32_t id = vm_read32(0x00E24F78u);
     if (id != last_id) { last_id = id; racacit_ds_weapon_profile(id < 256 && fam[id] >= 0 ? fam[id] : DSW_MEDIUM); }
     if (!strncmp(name, "veh_aphelion_fire", 17)) {                  /* the ship: blasters on the fire trigger */
         static int ship = 0; if (!ship) { ship = 1; racacit_ds_weapon_profile(DSW_LIGHT); }
@@ -1626,7 +1626,7 @@ extern "C" void racacit_snd_play_hook(ppu_context* ctx, int tag)
              * the controller shows up as "stays on the TV". */
             const unsigned long long f = g_racacit_fire_ms, now = ps3_qpc_us() / 1000ull;
             if (f && now - f < 60ull && name[0] && strncmp(name, "amb_", 4) && strncmp(name, "ui_", 3) && strncmp(name, "cha_", 4)) {
-                const uint32_t wid = vm_read32(0x00E24E78u);
+                const uint32_t wid = vm_read32(0x00E24F78u);
                 static uint32_t said[256]; static unsigned ns; static volatile long mg;
                 uint32_t h = wid * 2654435761u; for (const char* q = name; *q; q++) h = h * 31u + (uint8_t)*q;
                 while (__sync_lock_test_and_set(&mg, 1)) { }
@@ -1653,7 +1653,7 @@ extern "C" void racacit_snd_play_hook(ppu_context* ctx, int tag)
               if (!dup) fprintf(stderr, "[ds-name] %s%s%c", name, t_ds_cat ? "  (routed)" : "", 10);
           } }
         if (!strncmp(name, "wep_", 4) || !strncmp(name, "mag_net_", 8) || !strncmp(name, "sub_new_", 8)) {   /* which weapon makes which sounds */
-            const uint32_t wid = vm_read32(0x00E24E78u);   /* equipped weapon id (A Crack in Time) */
+            const uint32_t wid = vm_read32(0x00E24F78u);   /* equipped weapon id (A Crack in Time) */
             static uint32_t said[512]; static unsigned ns; static volatile long mw;
             uint32_t h = wid * 2654435761u; for (const char* q = name; *q; q++) h = h * 31u + (uint8_t)*q;
             while (__sync_lock_test_and_set(&mw, 1)) { }
@@ -1672,7 +1672,7 @@ extern "C" void racacit_snd_play_hook(ppu_context* ctx, int tag)
             __sync_lock_release(&mu);
         }
     }
-    /* SCREAM start (func_00979CF0: r3 bank, r4 sound) inside a routed
+    /* SCREAM start (func_0097A2F0: r3 bank, r4 sound) inside a routed
      * instance's start: the controller plays that sound itself. */
     if (tag == 3 && ds_on && t_ds_in && (t_ds_cat || t_ds_hcat))
         ds_player_scream((uint32_t)ctx->gpr[3], (uint32_t)ctx->gpr[4], t_ds_cat ? t_ds_lvl : 0.0f, t_ds_hcat ? 0.5f : 0.0f,

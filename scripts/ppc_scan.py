@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class Image:
     def __init__(self, elf=None):
-        elf = elf or os.path.join(ROOT, "input", "EBOOT.ELF")
+        elf = elf or os.path.join(ROOT, "dev", "EBOOT.ELF")
         self.data = open(elf, "rb").read()
         self.segs = []
         for s in json.load(open(os.path.join(ROOT, "out", "EBOOT.image.json"))):

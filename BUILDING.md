@@ -9,9 +9,9 @@ generates its C code from your own legally dumped copy of the game.
 
 - Windows, Git Bash, git, and Python 3.12
 - About 32 GB of RAM for the default build (`-j6` below; lower it on less)
-- From your own console and disc (`BCUS98124`), in `input/`:
-  - `input/EBOOT.ELF`: the decrypted game executable
-  - `input/libsre.prx`: decrypted from `dev_flash/sys/external/libsre.sprx`, for example with RPCS3
+- From your own console and disc (`BCUS98124`), in `dev/`:
+  - `dev/EBOOT.ELF`: the decrypted game executable
+  - `dev/libsre.prx`: decrypted from `dev_flash/sys/external/libsre.sprx`, for example with RPCS3
 
 ## Build
 

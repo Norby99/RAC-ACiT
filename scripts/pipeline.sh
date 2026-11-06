@@ -2,7 +2,7 @@
 # Ratchet & Clank: A Crack in Time — static recompilation pipeline.
 #
 # Usage: scripts/pipeline.sh [path/to/EBOOT.ELF]
-# Default input is input/EBOOT.ELF (your own decrypted dump).
+# Default input is dev/EBOOT.ELF (your own decrypted dump).
 #
 # Stages:
 #   1. ppu_loader       -> out/  (function table, imports, image)
@@ -14,13 +14,13 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PS3R="$ROOT/tools/ps3recomp"
-ELF="${1:-$ROOT/input/EBOOT.ELF}"
+ELF="${1:-$ROOT/dev/EBOOT.ELF}"
 OUT="$ROOT/out"
 RECOMP="$ROOT/game/src/recomp"
 SPU="$ROOT/game/spu"
 PY="${PY:-python3 -I}"
 
-[ -f "$ELF" ] || { echo "No ELF at $ELF — put your decrypted EBOOT.ELF in input/"; exit 1; }
+[ -f "$ELF" ] || { echo "No ELF at $ELF — put your decrypted EBOOT.ELF in dev/"; exit 1; }
 mkdir -p "$OUT" "$RECOMP" "$SPU"
 
 echo "== 1/5 Loader"
@@ -62,8 +62,8 @@ $PY "$PS3R/tools/extract_spu_images.py" "$ELF" --output "$OUT/spu_images" \
 # one symbol prefix and image id per image, game + libsre in one registry,
 # game/spu/spu_workloads.c). Lifting them bare here gives every image the same
 # spu_func_* names and the link fails on duplicates. Needs a decrypted
-# libsre.prx from your own firmware in input/.
-LIBSRE="${LIBSRE:-$ROOT/input/libsre.prx}"
+# libsre.prx from your own firmware in dev/.
+LIBSRE="${LIBSRE:-$ROOT/dev/libsre.prx}"
 [ -f "$LIBSRE" ] || { echo "No libsre.prx at $LIBSRE — decrypt dev_flash/sys/external/libsre.sprx with RPCS3"; exit 1; }
 $PY "$ROOT/scripts/lift_libsre.py" "$LIBSRE"
 
